@@ -24,28 +24,29 @@ module.exports = {
    * In most cases please use '/' !!!
    * Detail: https://cli.vuejs.org/config/#publicpath
    */
-  publicPath: '/',
+  publicPath: './',
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
   productionSourceMap: false,
   devServer: {
-      port: port,
-      open: true, //是否自动弹出浏览器页面
-      hotOnly: false, //是否开启热更新
+    port: port,
+    open: true, //是否自动弹出浏览器页面
+    hotOnly: true, //是否开启热更新
 
-      proxy: {
-        '/api': {
-          target: `http://192.168.1.14:8801/website/`, // 这个链接是要代理到的api地址
-          changeOrigin: false,
-          pathRewrite: {
-            '^/api': '',
-            // '^/log': {
-            //   target: 'localhost:8080/'
-            // }
-          }
+    proxy: {
+      '/api': {
+        // target: `http://192.168.1.14:8801/website/`, // 这个链接是要代理到的api地址
+        target: `http://gw.cngroup.net/website/`, // 这个链接是要代理到的api地址
+        changeOrigin: false,
+        pathRewrite: {
+          '^/api': '',
+          // '^/log': {
+          //   target: 'localhost:8080/'
+          // }
         }
-      },
+      }
+    },
     overlay: {
       warnings: false,
       errors: true
@@ -95,7 +96,7 @@ module.exports = {
       .end()
 
     config
-    // https://webpack.js.org/configuration/devtool/#development
+      // https://webpack.js.org/configuration/devtool/#development
       .when(process.env.NODE_ENV === 'development',
         config => config.devtool('cheap-source-map')
       )
@@ -107,7 +108,7 @@ module.exports = {
             .plugin('ScriptExtHtmlWebpackPlugin')
             .after('html')
             .use('script-ext-html-webpack-plugin', [{
-            // `runtime` must same as runtimeChunk name. default is `runtime`
+              // `runtime` must same as runtimeChunk name. default is `runtime`
               inline: /runtime\..*\.js$/
             }])
             .end()

@@ -1,74 +1,46 @@
 <template>
   <div id="bigEvent">
-    <div class="item">
+    <div class="item" v-for="item in data" :Key="item.id">
       <div class="itemLabel">
-        <img src="../../../assets/images/2018_n.png" />
+        <img :src="matchImg(item.year)" />
       </div>
-      <div class="itemCon">
+      <div class="itemCon" v-for="itemChild in item.list" :Key="itemChild.id">
         <div class="item-con-left">
-          <div class="en">Feb</div>
+          <div class="en">{{itemChild.publishTime | EnMonth}}</div>
           <div class="line"></div>
-          <div class="zn">02月</div>
+          <div class="zn">{{itemChild.publishTime | detailMonth}} 月</div>
         </div>
         <div class="item-con-right">
-          <div class="label">两微一站一库”技术服务正式推广</div>
-          <div class="con">2018年2月，公司，面向期刊社提供的“两微一站一库”技术服务正式推广，《科技资讯》《中外医疗》等期刊作为第一批推广案例正式上线。</div>
-        </div>
-      </div>
-    </div>
-
-
-
-
-     <div class="item">
-      <div class="itemLabel">
-        <img src="../../../assets/images/2018_n.png" />
-      </div>
-      <div class="itemCon">
-        <div class="item-con-left">
-          <div class="en">Feb</div>
-          <div class="line"></div>
-          <div class="zn">02月</div>
-        </div>
-        <div class="item-con-right">
-          <div class="label">两微一站一库”技术服务正式推广</div>
-          <div class="con">2018年2月，公司，面向期刊社提供的“两微一站一库”技术服务正式推广，《科技资讯》《中外医疗》等期刊作为第一批推广案例正式上线。</div>
-        </div>
-      </div>
-    </div>
-
-
-      
-      
-<div class="item">
-      <div class="itemLabel">
-        <img src="../../../assets/images/2018_n.png" />
-      </div>
-      <div class="itemCon">
-        <div class="item-con-left">
-          <div class="en">Feb</div>
-          <div class="line"></div>
-          <div class="zn">02月</div>
-        </div>
-        <div class="item-con-right">
-          <div class="label">两微一站一库”技术服务正式推广</div>
-          <div class="con">2018年2月，公司，面向期刊社提供的“两微一站一库”技术服务正式推广，《科技资讯》《中外医疗》等期刊作为第一批推广案例正式上线。</div>
+          <div class="label">{{itemChild.title}}</div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
 <script>
+import { articleList, bigEvent } from "@/api/indexPage.js";
+import { EnMonth, detailMonth } from "@/util/index";
 export default {
   name: "bigEvent",
+  filters: { EnMonth, detailMonth },
   components: {},
   data() {
-    return {};
+    return {
+      data: []
+    };
+  },
+  created() {
+    this.fetchEvent();
   },
   methods: {
-    // 选择行业和集团
-    choose(label) {}
+    fetchEvent() {
+      bigEvent(this.$store.state.requestParams).then(res => {
+        this.data = res.content.data;
+      });
+    },
+    matchImg(year) {
+      return require(`@/assets/images/${year || "2010"}_n.png`);
+    }
   }
 };
 </script>
@@ -78,8 +50,7 @@ export default {
 #bigEvent {
   width: 940px;
   margin-left: 30px;
-  .item{
-    
+  .item {
   }
   .itemLabel {
     width: 940px;
@@ -96,10 +67,10 @@ export default {
     }
   }
   .itemCon {
-    width:940px;
-    height:80px;
+    width: 940px;
+    height: 80px;
     margin-top: 40px;
-    margin-bottom:40px;
+    margin-bottom: 40px;
     .item-con-left {
       float: left;
       width: 72px;
@@ -142,19 +113,21 @@ export default {
     .item-con-right {
       margin-left: 20px;
       float: left;
-      width:848px;
+      width: 848px;
       word-wrap: break-word;
       word-break: break-all;
       overflow: auto;
       .label {
-        font-size: 16px;
-        font-family: Source Han Sans CN;
-        font-weight: 400;
+        height: 72px;
+        font-size: 24px;
+        font-family: cursive;
         color: rgba(55, 69, 103, 1);
+        display: flex;
+        align-items: center;
       }
       .con {
         font-size: 16px;
-        margin-top:10px;
+        margin-top: 10px;
         font-family: Source Han Sans CN;
         font-weight: 400;
         color: rgba(122, 139, 166, 1);

@@ -1,37 +1,52 @@
 <template>
-  <div class="content aboutUs-con">
+  <div class="content newsDetail-con">
     <div class="nav">
       您当前所在的位置：
-      <router-link class="linkClass" to="/">首页</router-link>|
-      <router-link class="linkClass" to="/news">新闻中心</router-link>|
-      <router-link class="linkClass" to="/news/groupNews">集团新闻</router-link>|
+      <router-link class="linkClass" to="/">
+        首页
+        <span class="line">|</span>
+      </router-link>
+
+      <router-link
+        v-show="routerData.parent.channelPath!=='/'"
+        class="linkClass"
+        :to="routerData.parent.channelPath"
+      >
+        {{routerData.parent.channelName}}
+        <span class="line">|</span>
+      </router-link>
+
+      <router-link
+        v-if="routerData.child"
+        class="linkClass"
+        :to="routerData.parent.channelPath+routerData.child.channelPath"
+      >
+        {{routerData.child && routerData.child.channelName}}
+        <span class="line">|</span>
+      </router-link>
       <span class="linkClass">新闻详情</span>
     </div>
-    <div class="details-label">【18刊博会】开辟科技转型道路 中文集团助力医药卫生期刊分会参展期刊博览会</div>
+    <div class="details-label">{{textCon.title}}</div>
     <div class="time">
       <p>
-        <img src="@/assets/images/icon_time.png" />2020-05-04
+        <img src="@/assets/images/icon_time.png" />
+        {{textCon.publishTime | detailTime}}
         <img src="@/assets/images/icon_yd.png" />
-        66
+        {{textCon.num}}
       </p>
     </div>
     <div class="details_content">
-      <p>2018年9月14日，中国（武汉）期刊交易博览会在武汉国际博览中心顺利开幕。中文集团作为医药卫生期刊分会的合作伙伴、技术支持，在刊博会期间围绕报刊业务管理人员创新能力建设培训班、医药卫生展馆布展、科技转型体系推广等模块从前期策划、宣传协调、组织推进等方面进行了全方位支持，不仅使各模块参展任务圆满成功，更展示了以中文集团“数字化与融合出版解决方案”为核心的期刊科技转型可行道路，响应了党和政府的督促与号召，为行业开拓视野、为传统期刊的现代化科技转型引领新风。</p>
-      <p>
-        全面布展 新方式展现期刊新面貌
-        早在7月末，中文集团作为中国期刊协会医药卫生期刊分会的友好伙伴、技术支持，已经提早投入到2018中国期刊交易博览会中国医药卫生展馆的布展任务当中。自2016年国务院印发《十三五国家战略性新兴产业发展规划》始，科技转型、数字出版就成为了期刊行业的发展目标。中文集团始终响应号召，携手医药卫生期刊，推进“中国医药卫生期刊数字化
-      </p>
-      <p>依托这次刊博会的机会，中文集团希望面向更多传统期刊展示、介绍医药卫生期刊的转型进程以及中文集团提供的“数字化与融合出版解决方案”。因此，中文集团先后设计多版展示方案，不断协调推进，精益求精，最终确立布展方案：展馆搭建使用全木质结构，配合灯光的使用，尽可能使展馆更加明亮、整洁，共展出医药卫生期刊杂志80余种共270多本，为医药卫生传统期刊的展示提供优质平台，中文集团还为展馆提供了大型展示灯箱7台，大型电视播放屏幕1台，大型LED显示屏1台，触摸显示屏2台，响应本次刊博会的科技创新主题，以全新方式展现传统医药卫生期刊的繁荣和积极转型的全新面貌。</p>
+      <div v-html="textCon.content"></div>
       <div class="relavantInfo">
         <!-- 政策法规 -->
         <div class="moduleDiv">
           <div class="bar"></div>
           <div class="label">相关资讯</div>
           <ul>
-            <template v-for="item in 4">
-              <li class="item-con" :key="item+'relavantInfo'">
-                <span class="ri-time">[2020-05-14]</span>
-                中文集团领导应邀参加安徽省期刊编辑继续教育面授班并授课
+            <template v-for="item in data">
+              <li class="item-con" :key="item.id" @click="detailData(item.id)">
+                <span class="ri-time">[{{item.publishTime | detailTime}}]</span>
+                {{item.title}}
               </li>
             </template>
           </ul>
@@ -41,20 +56,72 @@
   </div>
 </template>
 <script>
+import { detailTime } from "@/util";
+import { articleList, detailText } from "@/api/indexPage.js";
 export default {
-  name: "aboutUs",
-  components: {},
+  name: "newsDetail",
+  filters: { detailTime },
   data() {
-    return {};
+    return {
+      routerData: {
+        child: {},
+        parent: {}
+      },
+      textCon: {},
+      data: [],
+      pageInfo: {}
+    };
   },
-  methods: {}
+  beforeRouteEnter(to, from, next) {
+    // console.log(from, "from");
+    // 在渲染该组件的对应路由被 confirm 前调用
+    // 不！能！获取组件实例 `this`
+    // 因为当守卫执行前，组件实例还没被创建
+    next();
+  },
+  created() {
+    this.pageInfo = JSON.parse(localStorage.getItem("pageInfo"));
+    let articleId = JSON.parse(localStorage.getItem("articleId"));
+
+    console.log(this.pageInfo, "pageInfo");
+    this.routerData.child = this.pageInfo.currentMenu.child;
+    this.routerData.parent = this.pageInfo.currentMenu.parent;
+    this.detailData(articleId);
+    this.fetchData();
+  },
+
+  methods: {
+    detailData(id) {
+      var params = {
+        id
+      };
+      detailText(params).then(res => {
+        this.textCon = res.content.article;
+      });
+    },
+    fetchData() {
+      var params = {
+        pageNo: 1,
+        pageSize: 4,
+        title: this.$route.params.title,
+        channelOne: this.pageInfo.requestParams.channelOne,
+        channelTwo: this.pageInfo.requestParams.channelTwo
+      };
+      articleList(params).then(res => {
+        this.data = res.content.list.list;
+      });
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>
-.aboutUs-con {
+.line {
+  padding-left: 10px;
+}
+.newsDetail-con {
   width: 1100px;
   height: auto;
-  padding: 50px 0px;
+  padding: 50px 0px 0px 0px;
   .nav {
     width: 1100px;
     height: 50px;
@@ -69,6 +136,9 @@ export default {
     .linkClass {
       margin-left: 10px;
       margin-right: 10px;
+    }
+    .linkClass:hover {
+      color: #409eff;
     }
   }
   .details-label {
@@ -101,7 +171,6 @@ export default {
       border: 1px solid rgba(229, 234, 254, 1);
       padding: 20px;
       padding-top: 0px;
-      margin-bottom: 30px;
 
       .bar {
         width: 70px;
@@ -122,6 +191,10 @@ export default {
         font-weight: 400;
         color: rgba(122, 139, 166, 1);
         line-height: 40px;
+      }
+      .item-con:hover {
+        cursor: pointer;
+        color: #409eff;
       }
     }
   }

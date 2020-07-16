@@ -2,24 +2,26 @@
   <div id="project-news">
     <!-- 项目介绍 -->
     <div class="left-con">
-      <template v-for="item in 5">
-        <el-row class="row-bg">
+      <template v-for="item in data">
+        <el-row class="row-bg" :key="item.id">
           <el-col :span="8">
             <div class="img-col">
-              <img src="../../../assets/images/book.png" alt />
+              <img :src="item.imgPath" alt />
             </div>
           </el-col>
           <el-col :span="16">
             <div class="grid-content">
               <div class="title">
-                <p>贵州理工学院中外合作办学项目</p>
-                <p
-                  class="con"
-                >中文集团与贵州理工学院正式签订联合共建海外分校合作协议，郭陆庄董事长与曾羽书作为双方代表进行了签约仪式，双方在建设海外分校，推动中外教育交流、文化资源交流等诸多方面达成了高度一致。</p>
+                <p @click="handleToDetail(item.id)">{{item.title}}</p>
+
+                <p class="con">{{item.stract}}</p>
                 <p>
-                  <img src="@/assets/images/icon_time.png" />2020-05-04
-                  <img src="@/assets/images/icon_yd.png" />
-                  66
+                  <img src="@/assets/images/icon_time.png" />
+                  {{item.publishTime | detailTime}}
+                  <img
+                    src="@/assets/images/icon_yd.png"
+                  />
+                  {{item.num}}
                 </p>
               </div>
             </div>
@@ -27,51 +29,129 @@
         </el-row>
       </template>
       <div class="pageDiv">
-        <el-pagination background layout="prev, pager, next" :total="1000"></el-pagination>
+        <el-pagination
+          @current-change="handleChange"
+          :current-page="currentPage"
+          background
+          layout="prev, pager, next"
+          :total="total"
+        ></el-pagination>
       </div>
     </div>
     <div class="right-con">
       <!-- 政策法规 -->
       <template v-for="item in rightCon">
-        <div class="moduleDiv">
+        <div class="moduleDiv" :key="item.id">
           <div class="bar"></div>
-          <div class="label">{{item.label}}</div>
+          <div class="label">
+            {{item.label}}
+            <a class="more" @click="toMore(item)">更多</a>
+          </div>
           <ul>
-            <template v-for="item in 4">
-              <li class="item">
-                <div class="item-con">教育部关于进一步规范中外合作办学秩序的通知</div>
+            <template v-for="itemChild in item.content">
+              <li class="item" :key="itemChild.id">
+                <div class="item-con" @click="handleToDetail(itemChild.id)">{{itemChild.title}}</div>
+
                 <div class="time">
-                  <p>05-14</p>
-                  <p>2020</p>
+                  <p>{{itemChild.publishTime | detailMonth}}-{{itemChild.publishTime | detailDate}}</p>
+                  <p>{{itemChild.publishTime | detailYear}}</p>
                 </div>
               </li>
             </template>
           </ul>
         </div>
       </template>
-
-      <!-- 新闻动态 -->
     </div>
   </div>
 </template>
 
 <script>
-import toDetail from "@/components/toDetail";
+import { articleList } from "@/api/indexPage.js";
+import { detailTime, detailMonth, detailDate, detailYear } from "@/util";
 export default {
   name: "project-news",
-  components: {
-    "to-detail": toDetail
-  },
+  filters: { detailTime, detailMonth, detailDate, detailYear },
+  components: {},
   data() {
     return {
+      data: [],
+      currentPage: 1,
+      total: 0,
       rightCon: [
-        { label: "政策法规" },
-        { label: "新闻动态" },
-        { label: "行业热点" }
+        { id: "24", label: "政策法规", content: [] },
+        { id: "23", label: "新闻动态", content: [] },
+        { id: "22", label: "行业热点", content: [] }
       ]
     };
   },
-  methods: {}
+  created() {
+    this.fetchData();
+    this.fetchThreeData();
+  },
+  methods: {
+    // 查看更多
+    toMore(item) {
+      localStorage.setItem("eduJson", item.id);
+      this.$router.push({ name: "eduThree" });
+    },
+    // 去详情页面
+    handleToDetail(id) {
+      localStorage.setItem("articleId", id);
+      this.$router.push({ name: "newsDetail", params: { id } });
+    },
+    handleChange(page) {
+      this.currentPage = page;
+      this.fetchData();
+    },
+    fetchData() {
+      var params = {
+        pageNo: this.currentPage,
+        channelOne: this.$store.state.requestParams.channelOne,
+        channelTwo: this.$store.state.requestParams.channelTwo,
+        pageSize: 6
+      };
+      articleList(params).then(res => {
+        this.total = Number(res.content.list.total);
+        this.data = res.content.list.list;
+      });
+    },
+    // 右侧三级栏目数据获取
+    fetchThreeData() {
+      var params1 = {
+        pageNo: 1,
+        channelOne: this.$store.state.requestParams.channelOne,
+        channelTwo: this.$store.state.requestParams.channelTwo,
+        channelThree: 22,
+        pageSize: 5
+      };
+      var params2 = {
+        pageNo: 1,
+        channelOne: this.$store.state.requestParams.channelOne,
+        channelTwo: this.$store.state.requestParams.channelTwo,
+        channelThree: 23,
+        pageSize: 5
+      };
+      var params3 = {
+        pageNo: 1,
+        channelOne: this.$store.state.requestParams.channelOne,
+        channelTwo: this.$store.state.requestParams.channelTwo,
+        channelThree: 24,
+        pageSize: 5
+      };
+      articleList(params1).then(res => {
+        this.total = Number(res.content.list.total);
+        this.rightCon[2].content = res.content.list.list;
+      });
+      articleList(params2).then(res => {
+        this.total = Number(res.content.list.total);
+        this.rightCon[1].content = res.content.list.list;
+      });
+      articleList(params3).then(res => {
+        this.total = Number(res.content.list.total);
+        this.rightCon[0].content = res.content.list.list;
+      });
+    }
+  }
 };
 </script>
 <style lang="scss">
@@ -96,7 +176,6 @@ export default {
     height: 30px;
     text-align: center;
     margin-top: 60px;
-    margin-bottom: 100px;
     .el-pagination {
       margin: auto;
     }
@@ -132,16 +211,23 @@ export default {
       .label {
         font-size: 18px;
         font-family: Source Han Sans CN;
-        font-weight: 400;
+        font-weight: 600;
         color: rgba(55, 69, 103, 1);
         line-height: 24px;
         margin-top: 20px;
+        .more {
+          float: right;
+          font-weight: normal;
+          font-size: 16px;
+        }
       }
       .item {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        margin-top: 16px;
+        margin-top: 10px;
+        max-height: 48px;
+
         .item-con {
           width: 199px;
           font-size: 14px;
@@ -149,6 +235,17 @@ export default {
           font-weight: 400;
           color: rgba(122, 139, 166, 1);
           line-height: 24px;
+          -webkit-line-clamp: 2; //设置行数，2行显示
+          display: -webkit-box; //盒子模型
+          -webkit-box-orient: vertical; //元素的排列方式，垂直居中
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .item-con:hover {
+          cursor: pointer;
+          color: rgba(55, 95, 243, 1);
+          // background: rgba(239, 241, 252, 1);
+          // border: 1px solid rgba(225, 229, 239, 1);
         }
         .time {
           width: 44px;
@@ -180,6 +277,7 @@ export default {
   .img-col {
     width: 240px;
     height: 180px;
+    border: 1px solid #eee;
     img {
       width: 100%;
       height: 100%;
@@ -188,14 +286,19 @@ export default {
   .row-bg {
     margin-top: 80px;
   }
+
   .grid-content {
     .title {
       p:first-child {
         font-size: 20px;
-        height: 40px;
+        min-height: 40px;
         font-family: Source Han Sans CN;
         font-weight: 400;
         color: rgba(55, 69, 103, 1);
+      }
+      p:first-child:hover {
+        cursor: pointer;
+        color: #409eff;
       }
 
       p:last-child {

@@ -30,126 +30,148 @@ import Layout from '@/layout'
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
-export const constantRoutes = [
+export const constantRoutes = [{
+  path: '/login',
+  component: () => import('@/views/login/index'),
+  hidden: true
+},
+{
+  path: '/404',
+  component: () => import('@/views/404'),
+  hidden: true
+},
+{
+  path: '/',
+  redirect: '/login',
+  component: Layout,
+},
+{
+  path: '/program',
+  component: Layout,
+  // redirect: '/program',
+  children: [{
+    path: '/program',
+    name: 'program',
+    component: () => import('@/views/program/index'),
+    meta: {
+      title: '菜单列表',
+      icon: 'table'
+    }
+  }]
+},
+{
+  path: '/link',
+  component: Layout,
+  children: [{
+    path: '',
+    name: '友情链接',
+    component: () => import('@/views/link/index'),
+    meta: {
+      title: '友情链接',
+      icon: 'link'
+    }
+  },]
+},
+{
+  path: '/question',
+  component: Layout,
+  children: [{
+    path: '',
+    name: '常见问题',
+    component: () => import('@/views/question/index'),
+    meta: {
+      title: '常见问题',
+      icon: 'email'
+    }
+  },]
+},
+{
+  path: '/carousel',
+  component: Layout,
+  children: [{
+    path: '',
+    name: '轮播图',
+    component: () => import('@/views/carousel/index'),
+    meta: {
+      title: '轮播图',
+      icon: 'education'
+    }
+  },]
+},
+{
+  path: '/channel',
+  component: Layout,
+  children: [{
+    path: '',
+    name: '栏目管理',
+    component: () => import('@/views/channel/index'),
+    meta: {
+      title: '栏目管理',
+      icon: 'documentation'
+    }
+  },]
+},
+{
+  path: '/article',
+  component: Layout,
+  children: [{
+    path: '/manage',
+    name: '文章管理',
+    component: () => import('@/views/article/index'),
+    meta: {
+      title: '文章管理',
+      icon: 'edit'
+    }
+  },
   {
-    path: '/login',
-    component: () => import('@/views/login/index'),
+    path: '/articleEdit',
+    name: 'tinymce',
+    component: () => import('@/views/components/tinymce'),
+    meta: {
+      title: 'tinymce'
+    },
     hidden: true
   },
-  {
-    path: '/404',
-    component: () => import('@/views/404'),
-    hidden: true
-  },
-  // {
-  //   path: '/',
-  //   component: Layout,
-  //   redirect: '/dashboard',
-  //   children: [{
-  //     path: 'dashboard',
-  //     name: 'Dashboard',
-  //     component: () => import('@/views/dashboard/index'),
-  //     meta: { title: 'Dashboard', icon: 'dashboard' }
-  //   }]
-  // },
-  {
-    path: '/',
-    component: Layout,
-    redirect: '/program',
-    children: [
-      {
-        path: '/program',
-        name: 'program',
-        component: () => import('@/views/program/index'),
-        meta: { title: '菜单列表', icon: 'table' }
-      }
-    ]
-  },
-  {
-    path: '/link',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        name: '友情链接',
-         component: () => import('@/views/link/index'),
-          meta: { title: '友情链接', icon: 'link' }
-      },
-    ]
-  },
-  {
-    path: '/question',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        name: '常见问题',
-          component: () => import('@/views/question/index'),
-          meta: { title: '常见问题', icon: 'email' }
-      },
-    ]
-  },
-  {
-    path: '/carousel',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        name: '轮播图',
-          component: () => import('@/views/carousel/index'),
-          meta: { title: '轮播图', icon: 'education' }
-      },    
-    ]
-  },
-  {
-    path: '/channel',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        name: '栏目管理',
-          component: () => import('@/views/channel/index'),
-          meta: { title: '栏目管理', icon: 'documentation' }
-      },
-    ]
-  },
-  {
-    path: '/article',
-    component: Layout,
-    children: [
-      {
-        path: '/manage',
-        name: '文章管理',
-          component: () => import('@/views/article/index'),
-          meta: { title: '文章管理', icon: 'edit' }
-      },
-      {
-        path: '/articleEdit',
-        name: 'tinymce',
-        component: () => import('@/views/components/tinymce'),
-        meta: { title: 'tinymce' },
-        hidden: true
-      },
-    ]
-  },
-  {
-    path: '/userQuestion',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        name: '用户提问',
-          component: () => import('@/views/userQuestion/index'),
-          meta: { title: '用户提问管理', icon: 'message' }
-      },
-    ]
-  },
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  ]
+},
+{
+  path: '/userQuestion',
+  component: Layout,
+  children: [{
+    path: '',
+    name: '用户提问',
+    component: () => import('@/views/userQuestion/index'),
+    meta: {
+      title: '用户提问管理',
+      icon: 'message'
+    }
+  },]
+},
+{
+  path: '/uploadVedio',
+  component: Layout,
+  children: [{
+    path: '',
+    name: '宣传视频',
+    component: () => import('@/views/uploadVedio/index'),
+    meta: {
+      title: '宣传视频',
+      icon: 'eye-open'
+    }
+  },]
+},
+// 404 page must be placed at the end !!!
+{
+  path: '*',
+  redirect: '/404',
+  hidden: true
+}
 ]
 const createRouter = () => new Router({
   // mode: 'history', // require service support
-  scrollBehavior: () => ({ y: 0 }),
+  scrollBehavior: () => ({
+    y: 0
+  }),
   routes: constantRoutes
 })
 const router = createRouter()

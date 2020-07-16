@@ -1,7 +1,7 @@
 <template>
   <div id="publish">
-    <div class="content publish-con">
-        <router-view></router-view>
+    <div class="content">
+      <router-view></router-view>
     </div>
   </div>
 </template>
@@ -13,21 +13,11 @@ export default {
   data() {
     return {};
   },
-  methods: {
-  
-
-  }
+  methods: {}
 };
 </script>
-  
- 
 <style >
-.publish-con{
-  padding:50px 0px;
-  display: flex;
-  flex-direction: row;
+#publish {
+  width: 100%;
 }
-
-
-
 </style>

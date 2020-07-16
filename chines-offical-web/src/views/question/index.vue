@@ -3,17 +3,15 @@
     <div class="content border">
       <div class="head">常见问题列表</div>
       <!-- 列表 -->
-      <template v-for="item in 5">
+      <template v-for="item in problemList">
         <div class="liCon">
           <div class="label">
             <img class="iconImg" src="@/assets/images/Q.png" />
-            请问学术专著协同编辑联合出版平台的出版流程是什么？
+            {{item.question}}
           </div>
           <div class="con">
             <img class="iconImg" src="@/assets/images/A.png" />
-            学术专著协同编辑联合出版平台主要通过平台搭建，汇聚行业内的专家、作者、出版社等资源，为作者提供文献精准推送、专家指导、增值拓展出版等服务，
-            从而实现图书的联合出版，其出版流程为一、注册登录。使用中文知识网账号即可登录无须独立注册；二、填写需求。点击出书选项填写图书出版需求；三、精准推送。
-            根据作者出版需求精准推送相关参考文献；四、专家指导。根据出版图书专业领域推荐专家进行指导；五、出版发行。图书完成推荐至平台出版机构进行校审出版。
+            {{item.answer}}
           </div>
         </div>
       </template>
@@ -71,7 +69,7 @@
   </div>
 </template>
 <script>
-import { message } from "@/api/indexPage";
+import { message, problem } from "@/api/indexPage";
 import verify from "@/components/verify.vue";
 
 export default {
@@ -79,6 +77,7 @@ export default {
   components: { verify },
   data() {
     return {
+      problemList: [],
       identifyCodes: "123456789ABCDEFGHIN",
       identifyCode: "",
       form: {
@@ -103,6 +102,7 @@ export default {
     };
   },
   created() {
+    this.problemGet();
     //初始化验证码
     this.refreshCode();
   },
@@ -111,6 +111,15 @@ export default {
     this.makeCode(this.identifyCodes, 4);
   },
   methods: {
+    // 问题列表请求
+    problemGet() {
+      var params = {
+        pageNo: 1
+      };
+      problem(params).then(res => {
+        this.problemList = res.content.list.list;
+      });
+    },
     // 验证码
     //验证码abcdefghijklnmopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
     randomNum(min, max) {
@@ -127,6 +136,7 @@ export default {
         ];
       }
     },
+
     // 提交表单
     onSubmit(formName) {
       if (this.identifyCode.toLowerCase() == this.form.seccode) {
@@ -183,12 +193,22 @@ export default {
 }
 .form-btn {
   width: 100%;
-  height: 160px;
+  height: 40px;
   // display: flex;
   // flex-direction: row;
   // justify-content: flex-end;
   .el-button {
     float: right;
+  }
+  .el-button--primary {
+    width: 100px;
+    height: 40px;
+    background: linear-gradient(
+      -90deg,
+      rgba(55, 95, 243, 1) 0%,
+      rgba(95, 135, 247, 1) 100%
+    );
+    border-radius: 6px;
   }
 }
 </style>
@@ -232,7 +252,7 @@ export default {
   width: 1100px;
   height: 60px;
   display: block;
-  background: url(../../assets/images/btbg_year.png) no-repeat center center;
+  background: url(../../assets/images/btbg_2.png) no-repeat center center;
   background-size: 100% 100%;
   margin-top: 40px;
   font-size: 24px;
@@ -244,7 +264,7 @@ export default {
 }
 .liCon {
   width: 1100px;
-  height: 186px;
+  min-height: 100px;
   background: rgba(255, 255, 255, 1);
   box-shadow: 0px 15px 30px 0px rgba(58, 94, 245, 0.05);
   border-radius: 4px;

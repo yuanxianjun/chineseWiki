@@ -1,5 +1,5 @@
 <template>
-  <!-- 选项卡下面的静态背景图  v-if="$route."-->
+  <!-- 选项卡下面的静态背景图  -->
   <div id="topbg" v-if="show">
     <img class="bgImg" :src="bgUrl" />
     <img class="dynamic" v-if="textUrl" :src="textUrl" />
@@ -14,7 +14,7 @@ import groupTitle3 from "@/assets/images/title_gszz.png"; //text  公司资质
 import groupTitle4 from "@/assets/images/title_qywh.png"; //text  企业文化
 
 // 新闻中心
-import newsImg from "@/assets/images/img_top_xwzx.png"; //bg
+import newsImg from "@/assets/images/img_top_xwzx.png"; //新闻中心背景图
 import groupNews from "@/assets/images/title_jtxw.png"; //text 集团新闻
 import tradeNews from "@/assets/images/title_hygz.png"; //text 行业关注
 
@@ -36,7 +36,7 @@ import questionImg from "@/assets/images/img_top_wtfk.png"; //bg
 import aboutUsImg from "@/assets/images/img_top_lxwm.png"; //bg
 
 export default {
-  name: "backop",
+  name: "topBg",
   props: [],
   data() {
     return {
@@ -45,16 +45,25 @@ export default {
       show: true
     };
   },
+  beforeRouteEnter(to, from, next) {
+    // 在渲染该组件的对应路由被 confirm 前调用
+    // 不！能！获取组件实例 `this`
+    // 因为当守卫执行前，组件实例还没被创建
+    // this.matherImg(to.matched[0].path);
+
+    next(vm => {
+      // console.log(vm, "vm");
+      vm.matherImg(to.matched[0].path);
+      vm.matherTextImg(to.name);
+    });
+  },
   created() {
     // this.matherImg(this.$route.params) 如果该组件是刚加载的是监听不到没有办法在watch 里面监听route 事件的
-
     if (this.$route.path == "/") {
       this.show = false;
     }
-
     this.matherImg(this.$route.matched[0].name);
   },
-
   watch: {
     $route(to, from) {
       if (this.$route.path == "/") {
@@ -62,48 +71,49 @@ export default {
       } else {
         this.show = true;
       }
-
       this.matherImg(to.matched[0].path);
-
-      // 设置文字
-      if (to.name == "bigEvent") {
-        this.textUrl = groupTitle2;
-      } else if (to.name == "introduce") {
-        this.textUrl = groupTitle1;
-      } else if (to.name == "culture") {
-        this.textUrl = groupTitle4;
-      } else if (to.name == "quali") {
-        this.textUrl = groupTitle3;
-      }
-
-      // 新闻中心
-      else if (to.name == "groupNews") {
-        this.textUrl = groupNews;
-      } else if (to.name == "trends") {
-        this.textUrl = tradeNews;
-      }
-
-      // 出版服务
-      else if (to.name == "product") {
-        this.textUrl = publish1;
-      } else if (to.name == "serve") {
-        this.textUrl = publish2;
-      } else if (to.name == "company") {
-        this.textUrl = publish3;
-      }
-      //教育业务
-      else if (to.name == "partner") {
-        this.textUrl = education1;
-      } else if (to.name == "profile") {
-        this.textUrl = education2;
-      } else if (to.name == "project") {
-        this.textUrl = education3;
-      }
+      this.matherTextImg(to.name);
       // 问题反馈
       // 联系我们
     }
   },
   methods: {
+    matherTextImg(textName) {
+      // 设置文字
+      if (textName == "bigEvent") {
+        this.textUrl = groupTitle2;
+      } else if (textName == "introduce") {
+        this.textUrl = groupTitle1;
+      } else if (textName == "culture") {
+        this.textUrl = groupTitle4;
+      } else if (textName == "quali") {
+        this.textUrl = groupTitle3;
+      }
+
+      // 新闻中心
+      else if (textName == "groupNews") {
+        this.textUrl = groupNews;
+      } else if (textName == "trends") {
+        this.textUrl = tradeNews;
+      }
+
+      // 出版服务
+      else if (textName == "product") {
+        this.textUrl = publish1;
+      } else if (textName == "serve") {
+        this.textUrl = publish2;
+      } else if (textName == "company") {
+        this.textUrl = publish3;
+      }
+      //教育业务
+      else if (textName == "partner") {
+        this.textUrl = education1;
+      } else if (textName == "profile") {
+        this.textUrl = education2;
+      } else if (textName == "project") {
+        this.textUrl = education3;
+      }
+    },
     // 根据路由携带的参数来，控制图片的显示
     matherImg(parentUrl) {
       // 设置背景
@@ -115,7 +125,7 @@ export default {
         this.textUrl = groupNews;
       } else if (parentUrl == "/publish") {
         this.bgUrl = publishImg;
-        this.textUrl = publish1;
+        this.textUrl = publish2;
       } else if (parentUrl == "/education") {
         this.bgUrl = educationImg;
         this.textUrl = education1;
@@ -138,7 +148,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 #topbg {
-  width: 1920px;
+  width: 100%;
   height: 200px;
   overflow: hidden;
   position: relative;

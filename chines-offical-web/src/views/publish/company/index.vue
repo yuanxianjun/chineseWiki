@@ -1,62 +1,112 @@
 <template>
   <div id="company-news">
     <!-- 产品推介 -->
-    <template v-for="item in 5">
-
-    <el-row class="row-bg">
-      <el-col :span="5">
-        <div class="img-col">
-          <img src="../../../assets/images/book.png" alt />
-        </div>
-      </el-col>
-      <el-col :span="19">
-        <div class="grid-content">
-          <div class="title">
-            <p>系统医学</p>
-            <p>Systems Medicine</p>
-            <p>
-              <span>期刊简介</span>
-            </p>
-            <p
-              class="con"
-            >《系统医学》是国家卫生健康委员会主管，由卫计委医药卫生科技发展研究中心、全国卫生产业企业管理协会、《中国卫生产业》杂志社有限公司主办的专业医学术期刊。国际标准连续出版物号：ISSN 2096-1782；国内统一连续出版物号-CN 10-1369/R，邮发代号80-911。 以报道中外系统医学发展动态，推广我国系统医学研究成果，交流全球系统医学研究经验，推进我国系统医学学科研究，服务广大医药卫生工作人员，助力我国医疗卫生事业发展为办刊宗旨。 主要栏目：论著、基础医学系统研究、临床医学系统研究、中西医结合系统研究、内科研究、外科研究、儿科研究、皮肤病研究、影像医学研究、妇产科研究、肿瘤学研究、口腔医学研究、中医学研究、药学研究、临床与护理、综述。</p>
-          <p>
-
-            <to-detail></to-detail>
-          </p>
+    <template v-for="item in data">
+      <el-row class="row-bg" :key="item.id">
+        <el-col :span="5">
+          <div class="img-col">
+            <img :src="item.imgPath" />
           </div>
-
-        </div>
-      </el-col>
-    </el-row>
-
+        </el-col>
+        <el-col :span="19">
+          <div class="grid-content">
+            <div class="title">
+              <p>
+                <a :href="item.linkUrl || 'javascript:void(0);'" target="_blank">{{item.title}}</a>
+              </p>
+              <p>{{item.titleEn}}</p>
+              <p>
+                <span>期刊简介</span>
+              </p>
+              <p class="con">{{item.stract}}</p>
+              <p>
+                <to-detail :itemId="item.id">{{item.id}}</to-detail>
+              </p>
+            </div>
+          </div>
+        </el-col>
+      </el-row>
     </template>
+    <div class="pageDiv">
+      <el-pagination
+        @current-change="handleChange"
+        :current-page="currentPage"
+        background
+        layout="prev, pager, next"
+        :total="total"
+      ></el-pagination>
+    </div>
   </div>
 </template>
 
 <script>
-import toDetail from "@/components/toDetail"
+import { articleList } from "@/api/indexPage.js";
+import toDetail from "@/components/toDetail";
 export default {
   name: "company-news",
   components: {
-    'to-detail':toDetail
+    "to-detail": toDetail
   },
   data() {
-    return {};
+    return {
+      data: [],
+      currentPage: 1,
+      total: 0,
+      pageInfo: JSON.parse(localStorage.getItem("pageInfo"))
+    };
   },
-  methods: {}
+  created() {
+    this.fetchData();
+  },
+  methods: {
+    //分页查询
+    handleChange(page) {
+      this.currentPage = page;
+      this.fetchData();
+      window.scroll(0, 100);
+    },
+    fetchData() {
+      var params = this.pageInfo.requestParams;
+      params.pageNo = this.currentPage;
+      params.pageSize = 5;
+      articleList(params).then(res => {
+        this.data = res.content.list.list;
+        this.total = Number(res.content.list.total);
+      });
+    }
+  }
 };
 </script>
-  
+   <style lang="scss">
+.pageDiv {
+  margin-top: 20px;
+  .el-pagination {
+    text-align: center;
+  }
+  .el-pagination.is-background .el-pager li:not(.disabled).active {
+    background: linear-gradient(
+      -90deg,
+      rgba(56, 96, 244, 1) 0%,
+      rgba(95, 135, 248, 1) 100%
+    ) !important;
+    border-radius: 4px !important;
+  }
+}
+</style>
 <style lang="scss" scoped>
 #company-news {
   width: 1100px;
   .img-col {
     width: 210px;
     height: 299px;
+    border: 1px solid #eeee;
+    img {
+      width: 100%;
+      height: 100%;
+    }
   }
-  .row-bg{
-    margin-top:80px;
+  .row-bg {
+    margin-top: 80px;
   }
   .grid-content {
     .title {
@@ -83,9 +133,9 @@ export default {
             rgba(251, 191, 3, 1) 0%,
             rgba(250, 219, 125, 1) 100%
           );
-          
-          box-sizing:border-box;
-          padding:2px 8px;
+
+          box-sizing: border-box;
+          padding: 2px 8px;
           border-radius: 4px;
           text-align: center;
           font-size: 16px;
@@ -95,8 +145,8 @@ export default {
           line-height: 28px;
         }
       }
-      p:last-child{
-        margin-top:15px;
+      p:last-child {
+        margin-top: 15px;
       }
     }
     .con {
@@ -104,7 +154,7 @@ export default {
       font-family: Source Han Sans CN;
       font-weight: 400;
       color: rgba(122, 139, 166, 1);
-      line-height: 28px;  
+      line-height: 28px;
     }
   }
 }

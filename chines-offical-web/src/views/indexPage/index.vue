@@ -10,13 +10,13 @@
 
     <div class="content index-con">
       <div class="index-con-title">
-        <div class="titlelabel">新闻中心</div>
-        <div class="titleImg"></div>
+        <span class="titlelabel">新闻中心</span>
+        <span class="titleImg"></span>
       </div>
       <!-- 新华词典 -->
       <div class="xinghua-con">
-        <p class="xh-label">{{newsData.title}}</p>
-        <p class="xh-p">{{newsData.content}}</p>
+        <p class="xh-label" @click="handleToDetail(newsData.id)">{{newsData.title}}</p>
+        <p class="xh-p">{{newsData.stract}}</p>
       </div>
 
       <!-- 切换按钮 -->
@@ -36,24 +36,33 @@
       <!-- 新闻  行业 内容块儿 -->
       <div class="conShow">
         <div class="conShow-left">
-          <el-carousel :interval="5000">
-            <el-carousel-item v-for="item in 4" :key="item">
-              <h3>{{ item }}</h3>
-              <p class="conTitle">{{item}}</p>
+          <el-carousel arrow="always" :interval="5000" ref="carouselBelow" @change="setActiveItem">
+            <el-carousel-item v-for="item in NewsList" :key="item.id">
+              <!-- <h3>{{ item.imgPath }}</h3> -->
+              <img class="conImg" :src="item.imgPath" alt />
+              <p class="conTitle">{{item.title}}</p>
             </el-carousel-item>
           </el-carousel>
         </div>
         <div class="conShow-list">
           <ul>
-            <template v-for="item in NewsList">
-              <li class="listLi" :key="item.id">
-                <p class="ll-label">{{item.title}}</p>
+            <template v-for="(item,index) in NewsList">
+              <li
+                class="listLi"
+                :key="item.id"
+                :class="initalIndex == index ? 'itemIsActive' :''"
+                @mouseenter="hanldeListLi(index)"
+                @click="handleToDetail(item.id)"
+              >
+                <p class="ll-label">{{item.title | filterText}}</p>
+
                 <p class="ll-stat">
                   <img src="../../assets/images/icon_time.png" />
                   {{item.publishTime | detailTime }}
                   <img
                     src="../../assets/images/icon_yd.png"
-                  /> 60
+                  />
+                  {{item.num}}
                 </p>
               </li>
             </template>
@@ -66,17 +75,27 @@
     </div>
   </div>
 </template>
-
 <script>
 import { bannerList, findNews, findNewsList } from "@/api/indexPage";
 import { detailTime } from "@/util/index";
 import { mapActions } from "vuex";
+import toDetail from "@/components/toDetail";
 export default {
   name: "indexPage",
-  components: {},
-  filters: { detailTime },
+  components: { "to-detail": toDetail },
+  filters: {
+    detailTime,
+    filterText: text => {
+      if (text.length < 45) {
+        return text;
+      } else {
+        return text.substr(0, 39) + "......";
+      }
+    }
+  },
   data() {
     return {
+      initalIndex: 3, //当前展示的index图
       classNew: "btn btnActive btnNews",
       classFocus: "btn btnFocus",
       showNews: true,
@@ -94,6 +113,18 @@ export default {
     ...mapActions([
       "changeMenu" // 将 `this.matchActive()` 映射为 `this.$store.dispatch('changeMenu')`
     ]),
+    //点击列表让图片跟着变化
+    hanldeListLi(index) {
+      this.initalIndex = index;
+      this.$refs.carouselBelow.setActiveItem(index);
+    },
+    setActiveItem(index) {
+      this.initalIndex = index;
+    },
+    handleToDetail(itemId) {
+      localStorage.setItem("articleId", itemId);
+      this.$router.push({ name: "newsDetail", params: { id: itemId } });
+    },
     // 查看更多
     handleToMore() {
       let currentObj = {};
@@ -101,30 +132,33 @@ export default {
         currentObj = {
           child: {
             childName: "集团新闻",
-            url: "/groupNews",
-            name: "groupNews"
+            channelPath: "/groupNews",
+            channelName: "groupNews",
+            id: 11
           },
           parent: {
-            label: "集团新闻",
-            url: "/news",
-            name: "news"
+            label: "新闻中心",
+            channelPath: "/news",
+            channelName: "news",
+            id: "4"
           }
         };
       } else {
         currentObj = {
           child: {
             childName: "行业动态",
-            url: "/trends",
-            name: "trends"
+            channelPath: "/trends",
+            channelName: "trends",
+            id: 12
           },
           parent: {
-            label: "集团新闻",
-            url: "/news",
-            name: "news"
+            label: "新闻中心",
+            channelPath: "/news",
+            channelName: "news",
+            id: "4"
           }
         };
       }
-      console.log(currentObj);
       this.$store.dispatch("changeMenu", currentObj);
     },
     // 选择行业和集团
@@ -172,20 +206,47 @@ export default {
   
  
 <style >
+.header-tab .el-carousel__arrow {
+  width: 60px;
+  height: 60px;
+  font-size: 20px;
+}
 .conShow .el-carousel__container {
   position: relative;
   height: 360px;
 }
 .conShow .el-carousel__indicators--horizontal {
-  left: 75%;
+  display: none;
+}
+.conShow-left .el-carousel__arrow {
+  font-size: 18px;
 }
 </style>
 <style lang="scss"  scoped>
+.itemIsActive {
+  background: rgba(239, 241, 252, 1);
+  border: 1px solid rgba(225, 229, 239, 1);
+}
 .btnMore {
+  width: 80px;
+  height: 24px;
+  border-radius: 6px;
   float: right;
   text-align: right;
   height: 30px;
   margin-top: 25px;
+  .el-button--info.is-plain {
+    width: 80px;
+    height: 24px;
+    background: rgba(239, 241, 251, 1);
+    border-radius: 6px;
+    border: none;
+  }
+  .el-button--info.is-plain:focus,
+  .el-button--info.is-plain:hover {
+    background: #3860f4;
+    color: #fff;
+  }
 }
 .el-carousel__item h3 {
   color: #475669;
@@ -203,22 +264,25 @@ export default {
   background-color: #d3dce6;
 }
 #indexPage {
-  width: 1920px;
+  width: 100%;
   overflow-y: hidden;
 
   .index-con {
-    height: 902px;
+    // height: 810px;
     .index-con-title {
       width: 100%;
       display: flex;
       flex-direction: row;
       align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 120px;
+      text-align: center;
       .titlelabel {
         font-size: 28px;
         font-family: Source Han Sans CN;
         font-weight: 400;
         color: rgba(55, 69, 103, 1);
-        line-height: 72px;
       }
       .titleImg {
         width: 46px;
@@ -231,10 +295,16 @@ export default {
     // 新华
     .xinghua-con {
       width: 1100px;
-      height: 160px;
       background: rgba(255, 255, 255, 1);
       border: 1px solid rgba(225, 230, 240, 1);
       padding: 20px 50px;
+      margin-bottom: 30px;
+    }
+    .xinghua-con:hover {
+      p:first-child {
+        cursor: pointer;
+        color: #3860f4;
+      }
     }
     .xh-label {
       font-size: 28px;
@@ -242,7 +312,6 @@ export default {
       font-weight: bold;
       color: rgba(55, 69, 103, 1);
       text-align: center;
-      line-height: 70px;
     }
     .xh-p {
       text-align: center;
@@ -251,6 +320,7 @@ export default {
       font-weight: 400;
       color: rgba(122, 139, 166, 1);
       line-height: 24px;
+      margin-top: 10px;
     }
     // 集团新闻和行业帮助
     .btnTwo {
@@ -259,7 +329,7 @@ export default {
       display: flex;
       flex-direction: row;
       margin-top: 60px;
-      margin-bottom: 40px;
+      margin-bottom: 50px;
       .btnNews {
         margin-left: 310px;
       }
@@ -299,29 +369,51 @@ export default {
     // 内容展示块儿
     .conShow {
       width: 100%;
+      .conImg {
+        width: 100%;
+        height: 100%;
+      }
       .conTitle {
+        width: 100%;
+        height: 40px;
+        position: absolute;
+        bottom: 0px;
+        left: 0px;
+        line-height: 40px;
+        background: rgba(23, 25, 77, 0.6);
         font-size: 16px;
         font-family: Source Han Sans CN;
         font-weight: 400;
         color: rgba(255, 255, 255, 1);
-        line-height: 24px;
-        text-indent: 50px;
+        text-align: center;
+        word-wrap: none;
+        overflow: hidden;
       }
       .conShow-left {
         width: 620px;
         height: 360px;
         float: left;
       }
+
       .conShow-list {
         width: 460px;
         height: 360px;
         float: right;
+        .listLi:hover {
+          cursor: pointer;
+          background: rgba(239, 241, 252, 1);
+          border: 1px solid rgba(225, 229, 239, 1);
+          .ll-label {
+            color: rgba(56, 96, 244, 1);
+          }
+        }
         .listLi {
           width: 460px;
           height: 75px;
           border: 1px solid rgba(225, 230, 240, 1);
           padding: 17px 20px;
           margin-bottom: 20px;
+          position: relative;
           .ll-label {
             font-size: 16px;
             font-family: Source Han Sans CN;
@@ -336,6 +428,10 @@ export default {
           font-weight: 400;
           color: rgba(122, 139, 166, 1);
           text-align: right;
+
+          position: absolute;
+          right: 13px;
+          bottom: 10px;
           img {
             vertical-align: middle;
           }
@@ -344,13 +440,13 @@ export default {
     }
   }
 }
-
 .header-tab {
   .bannerImg {
-    width: 1920px;
+    width: 100%;
     height: 600px;
+    object-fit: cover;
   }
-  width: 1920px;
+  width: 100%;
   height: 600px;
   background: url(../../assets/images/banner02.png) no-repeat center center;
   background-size: 100% 100%;

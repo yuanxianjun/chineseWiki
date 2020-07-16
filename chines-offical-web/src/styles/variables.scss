@@ -11,10 +11,10 @@ $subMenuHover:#001528;
 
 $sideBarWidth: 210px;
 
-.content{
-  width:1100px;
-  margin:0 auto;
-  
+.content {
+  width: 1100px;
+  margin: 0 auto;
+  overflow: hidden;
 }
 
 // the :export directive is the magic sauce for webpack

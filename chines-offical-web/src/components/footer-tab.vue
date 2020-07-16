@@ -11,18 +11,18 @@
         </el-select>
       </div>
       <div class="center">
-        <el-select v-model="value2" placeholder="合作伙伴">
+        <el-select v-model="value2" placeholder="出版服务机构">
           <template v-for="item in partners">
-            <el-option value="合作伙伴" :key="item.id">
+            <el-option value="出版服务机构" :key="item.id">
               <div @click="hrefto(item.linkUrl)">{{item.title}}</div>
             </el-option>
           </template>
         </el-select>
       </div>
       <div class="right">
-        <el-select v-model="value3" placeholder="其他条目">
+        <el-select v-model="value3" placeholder="教育合作机构">
           <template v-for="item in otherClass">
-            <el-option value="其他条目" :key="item.id">
+            <el-option value="教育合作机构" :key="item.id">
               <div @click="hrefto(item.linkUrl)">{{item.title}}</div>
             </el-option>
           </template>
@@ -78,7 +78,7 @@ export default {
       getData();
     },
     hrefto(link) {
-      window.open("https://" + link);
+      window.open(link);
     }
   }
 };
@@ -86,16 +86,17 @@ export default {
 
 <style lang="scss" scoped>
 #footer-tab {
-  width: 1920px;
+  width: 100%;
   height: 80px;
   background: rgba(249, 250, 255, 1);
+  margin-top: 100px;
 }
 .footer-tab-content {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  line-height: 80px;
+  height: 80px;
   div {
     width: 300px;
     height: 32px;

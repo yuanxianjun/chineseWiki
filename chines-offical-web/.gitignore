@@ -1,7 +1,8 @@
 .DS_Store
 node_modules
 /dist
-
+/guanwang-web
+guanwang-web.zip
 # local env files
 .env.local
 .env.*.local
@@ -20,3 +21,4 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+

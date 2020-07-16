@@ -30,7 +30,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 #footer {
-  width: 1920px;
+  width: 100%;
   height: 360px;
 
   position: relative;
@@ -72,7 +72,7 @@ export default {
     font-size: 14px;
     font-family: Source Han Sans CN;
     font-weight: 400;
-    color: #545867;
+    color: #ffffff;
     line-height: 32px;
   }
   .qrcode {

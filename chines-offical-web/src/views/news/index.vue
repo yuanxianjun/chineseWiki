@@ -9,7 +9,7 @@
           style="height: 200px;"
         >
           <template v-for="(item,index) in tabList">
-            <el-tab-pane :key="index+'tab1'" :name="item.url | filteTab" :label="item.childName"></el-tab-pane>
+            <el-tab-pane :key="index+'tab1'" :name="item.id" :label="item.channelName"></el-tab-pane>
           </template>
         </el-tabs>
       </div>
@@ -21,8 +21,7 @@
 </template>
 
 <script>
-import tabList from "@/api/tabData.js";
-
+import { mapActions } from "vuex";
 export default {
   name: "news",
   components: {},
@@ -33,45 +32,75 @@ export default {
   },
   data() {
     return {
-      activeName: "groupNews",
+      activeName: "",
       tabPosition: "left",
       tabList: []
     };
   },
   beforeRouteUpdate(to, from, next) {
     // 设置背景
-    this.activeName = to.name;
-    // react to route changes...
     // don't forget to call next()
+
     next();
+
+    this.activeName = this.$store.state.requestParams.channelTwo;
   },
   created() {
-    this.tabList = tabList[2].children;
-    if (this.$store.state.currentMenu.child) {
-      this.activeName = this.$store.state.currentMenu.child.url;
-    }
-    console.log(this.activeName);
+    var data = JSON.parse(localStorage.getItem("pageInfo"));
+    data.tabList.forEach(item => {
+      if (item.isActive) {
+        return (this.tabList = item.children);
+      }
+    });
+
+    this.tabList.forEach(item => {
+      if (item.isActive == true) {
+        this.activeName = item.id;
+      }
+    });
   },
   methods: {
+    ...mapActions([
+      "changeMenu" // 将 `this.matchActive()` 映射为 `this.$store.dispatch('changeMenu')`
+    ]),
     // 选择行业和集团
     handleTab(panel) {
-      var url = "/news/" + this.activeName;
-      this.$router.push(url);
+      // 更新路由
+      let clickItem = this.tabList[panel.index],
+        currentObj = {};
+
+      currentObj.parent = this.$store.state.tabList.find(item => {
+        return item.isActive == true;
+      });
+
+      currentObj.child = Object.assign(clickItem);
+      this.matchActive(currentObj);
+    },
+    //  设置点击的路由
+    matchActive(currentObj) {
+      this.$store.dispatch("changeMenu", currentObj);
     }
   }
 };
 </script>
   
  
-<style >
+<style lang="scss" >
 .news-con {
-  padding: 50px 0px;
+  padding: 50px 0px 0px 0px;
   display: flex;
   flex-direction: row;
 }
 .newsNavigate {
-  /* width:80px; */
-  height: 200px;
+  width: 120px;
+  height: 300px;
   /* background:skyblue; */
+  .el-tabs {
+    height: 360px !important;
+  }
+  .el-tabs__item {
+    height: 60px;
+    line-height: 60px;
+  }
 }
 </style>

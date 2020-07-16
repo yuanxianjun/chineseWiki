@@ -2,12 +2,11 @@
 @import './mixin.scss';
 @import './transition.scss';
 @import './element-ui.scss';
-@import './sidebar.scss';
+
 
 body {
-  height: 100%;
-  margin:0;
-  padding:0;
+  margin: 0;
+  padding: 0;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -19,20 +18,16 @@ label {
 }
 
 html {
-  height: 100%;
   box-sizing: border-box;
-}
-
-#app {
-  height: 100%;
+  min-height: 101%;
 }
 
 *,
 *:before,
 *:after {
   box-sizing: inherit;
-  margin:0;
-  padding:0;
+  margin: 0;
+  padding: 0;
 }
 
 a:focus,
@@ -62,13 +57,16 @@ div:focus {
     height: 0;
   }
 }
-p{
-  margin:0;
-  padding:0;
+
+p {
+  margin: 0;
+  padding: 0;
 }
-li{
+
+li {
   list-style: none;
 }
+
 // main-container global css
 .app-container {
   padding: 20px;

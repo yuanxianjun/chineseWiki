@@ -1,20 +1,27 @@
 import request from '@/utils/request'
 
 export function oneList(params) {
-    return request({
-      url: '/sys/channel/oneList',
-      method: 'post',
-      params
-    })
+  return request({
+    url: '/sys/channel/oneList',
+    method: 'post',
+    params
+  })
 }
 export function twoList(params) {
-    return request({
-      url: '/sys/channel/twoList',
-      method: 'post',
-      params
-    })
+  return request({
+    url: '/sys/channel/twoList',
+    method: 'post',
+    params
+  })
 }
 
+export function threeList(params) {
+  return request({
+    url: '/sys/channel/threeList',
+    method: 'post',
+    params
+  })
+}
 export function create(params) {
   return request({
     url: '/sys/channel/insert',
@@ -46,4 +53,3 @@ export function detail(params) {
     params
   })
 }
-

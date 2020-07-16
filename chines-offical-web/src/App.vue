@@ -1,17 +1,16 @@
 <template>
-  <div id="app">
+  <div id="app" ref="app">
     <!-- 公共的头部 -->
-    <router-view name="comHead"></router-view>
+    <template v-if="showLogo">
+      <router-view name="comHead"></router-view>
+    </template>
     <!-- 首页的头部 -->
     <router-view name="indexHead"></router-view>
     <cu-header-tab></cu-header-tab>
 
     <router-view name="topbg"></router-view>
     <div class="appCon">
-      <transition name="fade" mode="out-in" appear>
-        <router-view></router-view>
-      </transition>
-      <!-- <router-view></router-view> -->
+      <router-view></router-view>
     </div>
     <footer-tab></footer-tab>
     <cu-footer></cu-footer>
@@ -24,6 +23,7 @@ import cuHeaderTab from "@/components/header-tab";
 import footerTab from "@/components/footer-tab";
 import cuFooter from "@/components/footer";
 import backTop from "@/components/backTop";
+import { mapActions } from "vuex";
 export default {
   name: "App",
   components: {
@@ -32,11 +32,36 @@ export default {
     footerTab,
     backTop
   },
+  data() {
+    return {
+      showLogo: true
+    };
+  },
+  watch: {},
+  mounted() {
+    // console.log(this.$route);
+    var currentObj = {
+      parent: {},
+      child: {}
+    };
+    // this.$store.dispatch("changeMenu", currentObj);
+    // window.addEventListener("scroll", this.listenScroll, true);
+  },
+  destroyed() {
+    // window.removeEventListener("scroll", this.listenScroll, true);
+  },
+
   methods: {
-    beforeEnter() {
-      this.$root.$emit("scrollBeforeEnter");
-      console.log(this.$root, "root");
-    }
+    ...mapActions([
+      "changeMenu" // 将 `this.matchActive()` 映射为 `this.$store.dispatch('changeMenu')`
+    ])
+    // listenScroll() {
+    //   if (window.pageYOffset > 60) {
+    //     this.showLogo = false;
+    //   } else {
+    //     this.showLogo = true;
+    //   }
+    // }
   }
 };
 </script>
@@ -47,12 +72,11 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  width: 1920px;
+  width: 100%;
   overflow-x: hidden;
 }
 .appCon {
   width: 100%;
-  height: auto;
   background: linear-gradient(
     180deg,
     rgba(249, 250, 255, 1) 0%,

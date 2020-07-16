@@ -22,6 +22,13 @@ export function channelTwoList(params) {
     params
   })
 }
+export function channelThreeList(params) {
+  return request({
+    url: '/web/channel/threeList',
+    method: 'post',
+    params
+  })
+}
 
 export function create(params) {
   return request({
@@ -54,4 +61,3 @@ export function detail(params) {
     params
   })
 }
-
